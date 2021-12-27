@@ -1,0 +1,23 @@
+[package]
+name = "get-rich-slow"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+web3 = "0.17.0"
+tokio = "1.15.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_yaml = "0.8"
+serde_json = "1.0"
+rocket = { version = "0.5.0-rc.1", features = ["json"]}
+async-trait = "0.1.52"
+hex = "0.4.3"
+reqwest = "0.11.8"
+regex = "1"
+
+[dependencies.rocket_contrib]
+version = "0.4"
+default-features = false
+features = ["json"]
+
