@@ -1,8 +1,9 @@
 use super::account::Account;
 use super::asset::Asset;
 use super::blockchain::get_assets_of_ethereum_account;
-use super::domainconfig::{DomainConfig, Fund};
+use super::domainconfig::{DomainConfig};
 use super::error::ApiError;
+use rocket::Config;
 use rocket::serde::{json::json, json::Json, json::Value, Serialize};
 use rocket::{Build, Rocket, State};
 use serde_json::map::Map;
@@ -25,10 +26,11 @@ pub struct FundDto {
     pub nominal_yearly_growth: f32,
     pub real_yearly_growth: f32,
     pub assets: Vec<AssetDto>,
+    pub target_size: Option<f32>,
 }
 
 impl FundDto {
-    pub fn new(name: String, icon: Option<String>, assets: Vec<AssetDto>) -> Self {
+    pub fn new(name: String, icon: Option<String>, assets: Vec<AssetDto>, target_size: Option<f32>) -> Self {
         let eps = 0.00001; // Division by zero avoidance
         let balance: f32 = assets.iter().map(|x| x.units * x.unit_price).sum::<f32>();
         let balance_in_one_year: f32 = assets
@@ -46,6 +48,7 @@ impl FundDto {
             nominal_yearly_growth: (balance_in_one_year + eps) / (balance + eps) - 1.,
             real_yearly_growth: (real_balance_in_one_year + eps) / (balance + eps) - 1.,
             assets: assets,
+            target_size: target_size,
         }
     }
 }
@@ -93,6 +96,7 @@ pub async fn get_overview(
             fund.name.clone(),
             fund.icon.clone(),
             asset_dtos,
+            fund.target_size,
         ));
     }
 
@@ -129,7 +133,13 @@ pub async fn get_block(domainconfig: &State<DomainConfig>) -> Result<Value, ApiE
 }
 
 pub fn get_rocket_build(domainconfig: DomainConfig) -> Rocket<Build> {
-    rocket::build()
+    let address: std::net::Ipv4Addr = domainconfig.listen_address.parse().expect("Invalid listen_address");
+    let config = Config {
+        port: domainconfig.port,
+        address: address.into(),
+        ..Config::debug_default()
+    };
+    rocket::custom(config)
         .manage(domainconfig)
         .mount("/", routes![get_overview, get_block,])
 }

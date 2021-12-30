@@ -1,11 +1,11 @@
-# Get Rich Slow
+# 🐌 Get Rich Slow
 
-## Purpose
-This is a Rust routine to track your assets, portfolios and crypto savings
+## 🦋 Purpose
+This is a stateless Rust HTTP server to track your assets,
+portfolios and crypto savings
 across multiple trading platforms, blockchains and wallets.
 
-
-## Supported Accounts
+## 🔧 Supported Accounts
 
 - Kraken | _Crypto Exchange_
 - TODO: Binance | _Crypto Exchange_
@@ -22,14 +22,48 @@ across multiple trading platforms, blockchains and wallets.
 - TODO: Polygon | _Cypto, DeFi_
 
 
-## Example Output
-TODO: Will be copy pasted if the first
-version works.
+## 🖥️ Example Output
+`http://127.0.0.1:8000/`
 ```json
-
+[
+  {
+    "name": "DeFi Wallet One",
+    "icon": "sun",
+    "balance": 242.93645,
+    "nominal_yearly_growth": 0.059315205,
+    "real_yearly_growth": 0.059315205,
+    "assets": [
+      {
+        "name": "BNB",
+        "description": "BSC",
+        "nominal_growth": 0,
+        "real_growth": 0,
+        "units": 0.01087607,
+        "unit_price": 234.9
+      },
+      {
+        "name": "BUSD",
+        "description": "ibBUSD",
+        "nominal_growth": 0.060830735,
+        "real_growth": 0.060830735,
+        "units": 222.88519,
+        "unit_price": 1
+      }
+    ]
+  }
+]
+```
+`http://127.0.0.1:8000/block`
+```json
+{
+  "Avalanche-C": 879265,
+  "BSC": 1387991,
+  "Ethereum": 1388869,
+  "Moonriver": 117575
+}
 ```
 
-## Config
+## ⚙️ Config
 
 ```yaml
 ---
@@ -114,14 +148,14 @@ listen-address: 127.0.0.1  # To make public use 0.0.0.0
 
 ```
 
-## Contributing
+## 🐛 Contributing
 
-### Pullrequests
+### 🌳 Pull requests
 Feel free to open a pull request for bug fixes or new features.  
 Please run `cargo fmt` before requesting.
 
-### Todos
-_Concrete todos_
+### ✅ Todos
+_Specific todos_
 - Kraken support
 - Binance support
 - Etoro support
@@ -132,7 +166,7 @@ _Concrete todos_
     - Fetch USD inflation data
     - Fetch stocks growth average to calculate apr
 
-_Unending todos_
+_Infinite todos_
 - [Insert crypto exchange] support
 - [Insert blockchain] support
 - [Insert defi platform] support

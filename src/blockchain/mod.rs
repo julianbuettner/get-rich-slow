@@ -2,12 +2,13 @@ mod abi;
 mod alpaca;
 mod defiasset;
 mod venus;
+mod benqi;
 
 use super::account::EthereumAccount;
 use super::cryptoprice::get_token_price;
 use super::domainconfig::DomainConfig;
 use super::error::ApiError;
-use super::ethereum::{EthereumChain, EthereumNode};
+use super::ethereum::{EthereumNode};
 use web3::types::Address;
 
 #[derive(Clone, PartialEq)]
@@ -77,6 +78,12 @@ pub async fn get_assets_of_ethereum_account(
         .map(|x| x.1)
         .collect::<Vec<Address>>();
 
+    let benqi_contracts: Vec<Address> = contracts_on_account_chain
+        .iter()
+        .filter(|x| x.0 == EthDefiToken::Benqi)
+        .map(|x| x.1)
+        .collect::<Vec<Address>>();
+
     let mut one_node_worked = false;
     let mut assets = Vec::new();
     for node in nodes_for_chain {
@@ -94,10 +101,15 @@ pub async fn get_assets_of_ethereum_account(
         if a.is_err() {
             continue;
         }
+        let b = benqi::get_benqi_assets(&node.web3, &account.wallet_address, &benqi_contracts).await;
+        if b.is_err() {
+            continue;
+        }
         one_node_worked = true;
         assets.append(&mut native.ok().unwrap());
         assets.append(&mut v.ok().unwrap());
         assets.append(&mut a.ok().unwrap());
+        assets.append(&mut b.ok().unwrap());
     }
     if !one_node_worked {
         return Err(ApiError::new(&format!(

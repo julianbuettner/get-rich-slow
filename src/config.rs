@@ -18,6 +18,8 @@ pub struct Fund {
     pub name: String,
     pub icon: Option<String>,
     pub accounts: Vec<String>,
+    #[serde(rename = "target-size")]
+    pub target_size: Option<f32>,
 }
 
 #[derive(Deserialize, Debug, Clone)]

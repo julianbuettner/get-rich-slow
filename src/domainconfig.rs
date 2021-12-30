@@ -10,6 +10,7 @@ pub struct Fund {
     pub name: String,
     pub icon: Option<String>,
     pub accounts: Vec<Account>,
+    pub target_size: Option<f32>,
 }
 
 pub struct DomainConfig {
@@ -62,6 +63,11 @@ impl DomainConfig {
                             .expect("Account of type bsc requires address"),
                     ),
                 }),
+                "kraken" => Account::Kraken {
+                    name: name.clone(),
+                    api_key: account_config.api_key.clone().expect("Kraken requires api-key"),
+                    api_secret: account_config.api_secret.clone().expect("Kraken requires api-secret"),
+                },
                 x => panic!("Invalid account type: {}", x),
             };
             accounts.insert(name.clone(), account);
@@ -85,6 +91,7 @@ impl DomainConfig {
                 name: config_fund.name.clone(),
                 icon: config_fund.icon.clone(),
                 accounts: fund_accounts,
+                target_size: config_fund.target_size,
             })
         }
 
