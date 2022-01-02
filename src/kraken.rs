@@ -26,6 +26,7 @@ async fn kraken_price_hashmap(
         .iter()
         .filter(|x| *x != "ZUSD")
         .filter(|x| *x != "ETH2")
+        .filter(|x| *x != "ZEUR")
         .map(|x| {
             if x.starts_with("X") && (x != "XTZ") {
                 format!("{}ZUSD", x)
@@ -35,7 +36,7 @@ async fn kraken_price_hashmap(
         })
         .collect::<Vec<String>>()
         .join(",");
-    let tickers = tickers + ",ETH2.SETH,XETHZUSD";
+    let tickers = tickers + ",ETH2.SETH,XETHZUSD,ZEURZUSD";
     println!("{} tickers", tickers);
     let response = client.get_tickers(&tickers).send().await?;
     let mut result = HashMap::new();
