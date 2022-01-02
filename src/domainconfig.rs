@@ -1,4 +1,4 @@
-use super::account::{Account, EthereumAccount};
+use super::account::{Account, EthereumAccount, KrakenAccount};
 use super::blockchain::EthDefiToken;
 use super::config::Configuration;
 use super::ethereum::{EthereumChain, EthereumNode};
@@ -63,11 +63,17 @@ impl DomainConfig {
                             .expect("Account of type bsc requires address"),
                     ),
                 }),
-                "kraken" => Account::Kraken {
+                "kraken" => Account::Kraken(KrakenAccount {
                     name: name.clone(),
-                    api_key: account_config.api_key.clone().expect("Kraken requires api-key"),
-                    api_secret: account_config.api_secret.clone().expect("Kraken requires api-secret"),
-                },
+                    api_key: account_config
+                        .api_key
+                        .clone()
+                        .expect("Kraken requires api-key"),
+                    api_secret: account_config
+                        .api_secret
+                        .clone()
+                        .expect("Kraken requires api-secret"),
+                }),
                 x => panic!("Invalid account type: {}", x),
             };
             accounts.insert(name.clone(), account);

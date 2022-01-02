@@ -8,7 +8,7 @@ pub async fn get_token_price(symbol: &String) -> Result<f32, ApiError> {
     // Special symbol handling
     match symbol.as_str() {
         "BUSD" => return Ok(1.0),
-        "DAI" => return Ok(1.0),  // May the peg persist
+        "DAI" => return Ok(1.0), // May the peg persist
         "BTCB" => symbol = "BTC".to_string(),
         _ => (),
     }

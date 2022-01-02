@@ -1,14 +1,14 @@
 mod abi;
 mod alpaca;
+mod benqi;
 mod defiasset;
 mod venus;
-mod benqi;
 
 use super::account::EthereumAccount;
 use super::cryptoprice::get_token_price;
 use super::domainconfig::DomainConfig;
 use super::error::ApiError;
-use super::ethereum::{EthereumNode};
+use super::ethereum::{EthereumChain, EthereumNode};
 use web3::types::Address;
 
 #[derive(Clone, PartialEq)]
@@ -91,17 +91,27 @@ pub async fn get_assets_of_ethereum_account(
         if native.is_err() {
             continue;
         }
-        let v =
-            venus::get_venus_assets(&node.web3, &account.wallet_address, &venus_contracts).await;
+        let v = if account.chain == EthereumChain::BinanceSmartChain {
+            venus::get_venus_assets(&node.web3, &account.wallet_address, &venus_contracts).await
+        } else {
+            Ok(Vec::new())
+        };
         if v.is_err() {
             continue;
         }
-        let a =
-            alpaca::get_alpaca_assets(&node.web3, &account.wallet_address, &alpaca_contracts).await;
+        let a = if account.chain == EthereumChain::BinanceSmartChain {
+            alpaca::get_alpaca_assets(&node.web3, &account.wallet_address, &alpaca_contracts).await
+        } else {
+            Ok(Vec::new())
+        };
         if a.is_err() {
             continue;
         }
-        let b = benqi::get_benqi_assets(&node.web3, &account.wallet_address, &benqi_contracts).await;
+        let b = if account.chain == EthereumChain::AvalancheC {
+            benqi::get_benqi_assets(&node.web3, &account.wallet_address, &benqi_contracts).await
+        } else {
+            Ok(Vec::new())
+        };
         if b.is_err() {
             continue;
         }

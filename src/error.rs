@@ -59,3 +59,11 @@ impl From<std::num::ParseFloatError> for ApiError {
         }
     }
 }
+
+impl From<kraken_client::error::Error> for ApiError {
+    fn from(err: kraken_client::error::Error) -> Self {
+        Self {
+            error_message: format!("Kraken API Error: {:?}", err),
+        }
+    }
+}

@@ -15,7 +15,7 @@ async-trait = "0.1.52"
 hex = "0.4.3"
 reqwest = "0.11.8"
 regex = "1"
-polipo = "0.2.5"
+kraken_client = "0.15.0"
 
 [dependencies.rocket_contrib]
 version = "0.4"

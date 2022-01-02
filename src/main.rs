@@ -8,6 +8,8 @@ mod domainconfig;
 mod error;
 mod ethereum;
 mod growth;
+mod kraken;
+
 #[macro_use]
 extern crate rocket;
 use rocket::{Build, Rocket};

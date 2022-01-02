@@ -1,10 +1,11 @@
 use super::account::Account;
 use super::asset::Asset;
 use super::blockchain::get_assets_of_ethereum_account;
-use super::domainconfig::{DomainConfig};
+use super::domainconfig::DomainConfig;
 use super::error::ApiError;
-use rocket::Config;
+use super::kraken::get_assets_of_kraken_account;
 use rocket::serde::{json::json, json::Json, json::Value, Serialize};
+use rocket::Config;
 use rocket::{Build, Rocket, State};
 use serde_json::map::Map;
 
@@ -30,7 +31,12 @@ pub struct FundDto {
 }
 
 impl FundDto {
-    pub fn new(name: String, icon: Option<String>, assets: Vec<AssetDto>, target_size: Option<f32>) -> Self {
+    pub fn new(
+        name: String,
+        icon: Option<String>,
+        assets: Vec<AssetDto>,
+        target_size: Option<f32>,
+    ) -> Self {
         let eps = 0.00001; // Division by zero avoidance
         let balance: f32 = assets.iter().map(|x| x.units * x.unit_price).sum::<f32>();
         let balance_in_one_year: f32 = assets
@@ -66,11 +72,13 @@ pub async fn get_overview(
                     name: _,
                     api_key: _,
                 } => todo!(),
-                Account::Kraken {
-                    name: _,
-                    api_key: _,
-                    api_secret: _,
-                } => todo!(),
+                Account::Kraken(kraken_account) => {
+                    get_assets_of_kraken_account(domainconfig, kraken_account)
+                        .await?
+                        .iter_mut()
+                        .map(|a| Box::new(a.clone()) as Box<dyn Asset>)
+                        .collect::<Vec<Box<dyn Asset>>>()
+                }
                 Account::Ethereum(eth_account) => {
                     get_assets_of_ethereum_account(domainconfig, eth_account)
                         .await?
@@ -133,7 +141,10 @@ pub async fn get_block(domainconfig: &State<DomainConfig>) -> Result<Value, ApiE
 }
 
 pub fn get_rocket_build(domainconfig: DomainConfig) -> Rocket<Build> {
-    let address: std::net::Ipv4Addr = domainconfig.listen_address.parse().expect("Invalid listen_address");
+    let address: std::net::Ipv4Addr = domainconfig
+        .listen_address
+        .parse()
+        .expect("Invalid listen_address");
     let config = Config {
         port: domainconfig.port,
         address: address.into(),
