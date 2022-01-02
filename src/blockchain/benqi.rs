@@ -105,17 +105,11 @@ pub async fn get_benqi_assets(
         0x48, 0x6A, 0xf3, 0x95, 0x19, 0xB4, 0xDc, 0x9a, 0x7f, 0xCc, 0xd3, 0x18, 0x21, 0x73, 0x52,
         0x83, 0x0E, 0x8A, 0xD9, 0xb4,
     ]);
-    /*let address: Address = H160(
-        [
-            0xd3, 0x8a, 0x19, 0x10, 0x05, 0x30, 0xb9, 0x9c, 0x3b, 0x84,
-            0xcc, 0xa9, 0x71, 0xdf, 0xd9, 0x6b, 0xd5, 0x57, 0xaa, 0x91,
-        ]
-    );*/
     let smart = Web3Contract::new(web3.eth(), address, get_benqi_comptroller_abi());
     let outstanding_qi: web3::types::U256 = smart
         .query(
-            "getBlockTimestamp", // rewardAccrued
-            (),                  // (0 as u16, *wallet_address),
+            "rewardAccrued", // rewardAccrued
+            (0 as u8, *wallet_address),                  // (0 as u16, *wallet_address),
             None,
             web3::contract::Options::default(),
             None,
@@ -124,8 +118,8 @@ pub async fn get_benqi_assets(
         .unwrap();
     let outstanding_avax: web3::types::U256 = smart
         .query(
-            "getBlockTimestamp",
-            (), // (1 as u16, *wallet_address),
+            "rewardAccrued",
+            (1 as u8, *wallet_address),
             None,
             web3::contract::Options::default(),
             None,

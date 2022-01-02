@@ -37,7 +37,6 @@ async fn kraken_price_hashmap(
         .collect::<Vec<String>>()
         .join(",");
     let tickers = tickers + ",ETH2.SETH,XETHZUSD,ZEURZUSD";
-    println!("{} tickers", tickers);
     let response = client.get_tickers(&tickers).send().await?;
     let mut result = HashMap::new();
     result.insert("ZUSD".to_string(), 1.0);
@@ -74,7 +73,6 @@ async fn kraken_price_hashmap(
         "ETH2".to_string(),
         eth2eth.unwrap() * result.get("XETH").unwrap(),
     );
-    println!("result {:?}", result);
     Ok(result)
 }
 
@@ -94,7 +92,6 @@ pub async fn get_assets_of_kraken_account(
     let client = Client::new(account.api_key.as_str(), account.api_secret.as_str());
 
     let response = client.get_account_balance().send().await?;
-    println!("Resp: {:?}", response);
 
     let response = response
         .iter()
