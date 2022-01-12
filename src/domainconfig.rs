@@ -34,6 +34,7 @@ fn blockchain_identifier_to_enum(identifier: &str) -> EthereumChain {
         "avalanche-c" => EthereumChain::AvalancheC,
         "ethereum" => EthereumChain::Ethereum,
         "moonriver" => EthereumChain::Moonriver,
+        "moonbeam" => EthereumChain::Moonbeam,
         e => panic!("Unexpected blockchain identifier: {}", e),
     }
 }
@@ -73,6 +74,16 @@ impl DomainConfig {
                         .api_secret
                         .clone()
                         .expect("Kraken requires api-secret"),
+                }),
+                "moonbeam" => Account::Ethereum(EthereumAccount {
+                    name: name.clone(),
+                    chain: EthereumChain::Moonbeam,
+                    wallet_address: hex_to_address(
+                        &account_config
+                            .address
+                            .clone()
+                            .expect("Account of type moonbeam requires address")
+                    ),
                 }),
                 x => panic!("Invalid account type: {}", x),
             };

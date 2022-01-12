@@ -165,8 +165,6 @@ pub async fn get_benqi_assets(
 
         let balance_usd = balance_float * exchange_rate_float;
 
-        println!("Pool reward {}", pool_reward_apr);
-
         res.push(DefiAsset::new(
             apy_float as f32 + pool_reward_apr as f32,
             get_underlaying_name(&symbol)?,
