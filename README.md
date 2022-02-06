@@ -53,6 +53,15 @@ across multiple trading platforms, blockchains and wallets.
   }
 ]
 ```
+
+Prometheus Metrics:  
+`http://127.0.0.1:8000/metrics`
+```
+asset {fund="DeFi Wallet One", name="BNB", description="BSC", growth=0.0, units=0.01087607, unit-price=234.9, dollars=2.554717328}
+asset {fund="DeFi Wallet One", name="BUSD", description="ibBUSD", growth=0.060830735, units=222.88519, unit-price=1., dollars=222.88519}
+```
+
+
 `http://127.0.0.1:8000/block`
 ```json
 {
@@ -129,7 +138,7 @@ nodes:
     avalanche-c: https://api.avax.network/ext/bc/C/rpc
 
 # ==
-# Here you speficy a list of whitelisted clients
+# Here you specify a list of whitelisted clients
 # The tokens have to be submitted as header named Auth
 #
 # tr -dc A-Za-z0-9 </dev/urandom | head -c 20 ; echo ''

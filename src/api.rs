@@ -111,6 +111,44 @@ pub async fn get_overview(
     Ok(Json(fund_dtos))
 }
 
+#[get("/metrics")]
+pub async fn get_metrics(domainconfig: &State<DomainConfig>) -> Result<String, ApiError> {
+    let mut result = String::new();
+    for fund in domainconfig.funds.iter() {
+        for account in fund.accounts.iter() {
+            let assets: Vec<Box<dyn Asset>> = match account {
+                Account::Etoro {
+                    name: _,
+                    api_key: _,
+                } => todo!(),
+                Account::Kraken(kraken_account) => {
+                    get_assets_of_kraken_account(domainconfig, kraken_account)
+                        .await?
+                        .iter_mut()
+                        .map(|a| Box::new(a.clone()) as Box<dyn Asset>)
+                        .collect::<Vec<Box<dyn Asset>>>()
+                }
+                Account::Ethereum(eth_account) => {
+                    get_assets_of_ethereum_account(domainconfig, eth_account)
+                        .await?
+                        .iter_mut()
+                        .map(|x| Box::new(x.clone()) as Box<dyn Asset>)
+                        .collect::<Vec<Box<dyn Asset>>>()
+                }
+            };
+            for a in assets {
+                let units = a.get_units();
+                let unit_price = a.get_unit_price();
+                result.push_str(&format!(
+                    "asset {{fund=\"{}\", name=\"{}\", description=\"{}\", growth={}, units={}, unit-price={}, dollars={} }}\n",
+                    fund.name, a.get_name(), a.get_description(), a.get_growth().get_real_growth(), units, unit_price, units * unit_price,
+                ));
+            }
+        }
+    }
+    Ok(result)
+}
+
 #[get("/block")]
 pub async fn get_block(domainconfig: &State<DomainConfig>) -> Result<Value, ApiError> {
     let mut map = Map::new();
@@ -152,5 +190,5 @@ pub fn get_rocket_build(domainconfig: DomainConfig) -> Rocket<Build> {
     };
     rocket::custom(config)
         .manage(domainconfig)
-        .mount("/", routes![get_overview, get_block,])
+        .mount("/", routes![get_overview, get_block, get_metrics])
 }

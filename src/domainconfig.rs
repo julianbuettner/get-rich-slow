@@ -82,7 +82,7 @@ impl DomainConfig {
                         &account_config
                             .address
                             .clone()
-                            .expect("Account of type moonbeam requires address")
+                            .expect("Account of type moonbeam requires address"),
                     ),
                 }),
                 x => panic!("Invalid account type: {}", x),
