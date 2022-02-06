@@ -114,7 +114,10 @@ pub async fn get_overview(
 #[get("/metrics")]
 pub async fn get_metrics(domainconfig: &State<DomainConfig>) -> Result<String, ApiError> {
     let mut result = String::from(
-        "# HELP get_rich_slow Asset for getting rich slow.\n# TYPE get_rich_slow gauge\n"
+        "# HELP get_rich_slow_asset Asset value in USD.\n
+        # TYPE get_rich_slow_asset gauge\n
+        # HELP get_rich_slow_growth Growth of asset.\n
+        # TYPE get_rich_slow_growth gauge\n"
     );
     for fund in domainconfig.funds.iter() {
         for account in fund.accounts.iter() {
@@ -142,8 +145,12 @@ pub async fn get_metrics(domainconfig: &State<DomainConfig>) -> Result<String, A
                 let units = a.get_units();
                 let unit_price = a.get_unit_price();
                 result.push_str(&format!(
-                    "get_rich_slow {{fund=\"{}\", name=\"{}\", description=\"{}\" }} {}\n",
+                    "get_rich_slow_asset {{fund=\"{}\", name=\"{}\", description=\"{}\"}} {}\n",
                     fund.name, a.get_name(), a.get_description(), units * unit_price,
+                ));
+                result.push_str(&format!(
+                    "get_rich_slow_growth {{fund=\"{}\", name=\"{}\", description=\"{}\"}} {}\n",
+                    fund.name, a.get_name(), a.get_description(), a.get_growth().get_real_growth(),
                 ));
             }
         }

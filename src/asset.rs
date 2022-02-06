@@ -53,6 +53,6 @@ impl Asset for GenericAsset {
     }
 
     fn get_description(&self) -> String {
-        self.trading_symbol.clone()
+        self.description.clone()
     }
 }
