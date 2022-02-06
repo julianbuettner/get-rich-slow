@@ -150,7 +150,7 @@ pub async fn get_metrics(domainconfig: &State<DomainConfig>) -> Result<String, A
                 ));
                 result.push_str(&format!(
                     "get_rich_slow_growth {{fund=\"{}\", name=\"{}\", description=\"{}\"}} {}\n",
-                    fund.name, a.get_name(), a.get_description(), a.get_growth().get_real_growth(),
+                    fund.name, a.get_name(), a.get_description(), a.get_growth().get_real_growth() * units * unit_price,
                 ));
             }
         }
