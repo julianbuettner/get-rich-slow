@@ -113,7 +113,9 @@ pub async fn get_overview(
 
 #[get("/metrics")]
 pub async fn get_metrics(domainconfig: &State<DomainConfig>) -> Result<String, ApiError> {
-    let mut result = String::new();
+    let mut result = String::from(
+        "# HELP get_rich_slow Asset for getting rich slow.\n# TYPE get_rich_slow gauge\n"
+    );
     for fund in domainconfig.funds.iter() {
         for account in fund.accounts.iter() {
             let assets: Vec<Box<dyn Asset>> = match account {
