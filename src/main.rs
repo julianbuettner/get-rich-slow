@@ -9,6 +9,7 @@ mod error;
 mod ethereum;
 mod growth;
 mod kraken;
+mod nordigen;
 
 #[macro_use]
 extern crate rocket;

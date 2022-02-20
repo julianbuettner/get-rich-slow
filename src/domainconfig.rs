@@ -1,4 +1,4 @@
-use super::account::{Account, EthereumAccount, KrakenAccount};
+use super::account::{Account, EthereumAccount, KrakenAccount, NordigenAccount};
 use super::blockchain::EthDefiToken;
 use super::config::Configuration;
 use super::ethereum::{EthereumChain, EthereumNode};
@@ -18,6 +18,7 @@ pub struct DomainConfig {
     pub smart_contracts: Vec<(EthereumChain, EthDefiToken, Address)>,
     pub eth_nodes: Vec<EthereumNode>,
     pub client_whitelist: Option<Vec<String>>,
+    pub nordigen_cache_hours: Option<u64>,
     pub port: u16,
     pub listen_address: String,
 }
@@ -85,6 +86,17 @@ impl DomainConfig {
                             .expect("Account of type moonbeam requires address"),
                     ),
                 }),
+                "nordigen" => Account::Nordigen(NordigenAccount {
+                    name: name.clone(),
+                    refresh_token: account_config
+                        .refresh_token
+                        .clone()
+                        .expect("A nordigen account requires refresh-token"),
+                    account_id: account_config
+                        .account_id
+                        .clone()
+                        .expect("A nordigen account requires account-id"),
+                }),
                 x => panic!("Invalid account type: {}", x),
             };
             accounts.insert(name.clone(), account);
@@ -151,6 +163,7 @@ impl DomainConfig {
             eth_nodes: nodes,
             client_whitelist: config.clients,
             port: config.port,
+            nordigen_cache_hours: config.nordigen_cache_hours,
             listen_address: config.listen_address,
         }
     }

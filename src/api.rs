@@ -4,10 +4,14 @@ use super::blockchain::get_assets_of_ethereum_account;
 use super::domainconfig::DomainConfig;
 use super::error::ApiError;
 use super::kraken::get_assets_of_kraken_account;
+use super::nordigen::{get_assets_of_nordigen_account, NordigenCache};
 use rocket::serde::{json::json, json::Json, json::Value, Serialize};
 use rocket::Config;
 use rocket::{Build, Rocket, State};
 use serde_json::map::Map;
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
+use std::time::{Duration, SystemTime};
 
 #[derive(Serialize)]
 pub struct AssetDto {
@@ -62,16 +66,14 @@ impl FundDto {
 #[get("/")]
 pub async fn get_overview(
     domainconfig: &State<DomainConfig>,
+    nordigen_cache: &State<NordigenCache>,
 ) -> Result<Json<Vec<FundDto>>, ApiError> {
     let mut fund_dtos = Vec::new();
+
     for fund in domainconfig.funds.iter() {
         let mut collected_assets = Vec::new();
         for account in fund.accounts.iter() {
             let mut assets: Vec<Box<dyn Asset>> = match account {
-                Account::Etoro {
-                    name: _,
-                    api_key: _,
-                } => todo!(),
                 Account::Kraken(kraken_account) => {
                     get_assets_of_kraken_account(domainconfig, kraken_account)
                         .await?
@@ -81,6 +83,13 @@ pub async fn get_overview(
                 }
                 Account::Ethereum(eth_account) => {
                     get_assets_of_ethereum_account(domainconfig, eth_account)
+                        .await?
+                        .iter_mut()
+                        .map(|x| Box::new(x.clone()) as Box<dyn Asset>)
+                        .collect::<Vec<Box<dyn Asset>>>()
+                }
+                Account::Nordigen(nordigen_account) => {
+                    get_assets_of_nordigen_account(nordigen_cache, nordigen_account)
                         .await?
                         .iter_mut()
                         .map(|x| Box::new(x.clone()) as Box<dyn Asset>)
@@ -117,15 +126,11 @@ pub async fn get_metrics(domainconfig: &State<DomainConfig>) -> Result<String, A
         "# HELP get_rich_slow_asset Asset value in USD.\n
         # TYPE get_rich_slow_asset gauge\n
         # HELP get_rich_slow_growth Growth of asset.\n
-        # TYPE get_rich_slow_growth gauge\n"
+        # TYPE get_rich_slow_growth gauge\n",
     );
     for fund in domainconfig.funds.iter() {
         for account in fund.accounts.iter() {
             let assets: Vec<Box<dyn Asset>> = match account {
-                Account::Etoro {
-                    name: _,
-                    api_key: _,
-                } => todo!(),
                 Account::Kraken(kraken_account) => {
                     get_assets_of_kraken_account(domainconfig, kraken_account)
                         .await?
@@ -140,17 +145,26 @@ pub async fn get_metrics(domainconfig: &State<DomainConfig>) -> Result<String, A
                         .map(|x| Box::new(x.clone()) as Box<dyn Asset>)
                         .collect::<Vec<Box<dyn Asset>>>()
                 }
+                Account::Nordigen(nordigen_account) => {
+                    todo!();
+                }
             };
             for a in assets {
                 let units = a.get_units();
                 let unit_price = a.get_unit_price();
                 result.push_str(&format!(
                     "get_rich_slow_asset {{fund=\"{}\", name=\"{}\", description=\"{}\"}} {}\n",
-                    fund.name, a.get_name(), a.get_description(), units * unit_price,
+                    fund.name,
+                    a.get_name(),
+                    a.get_description(),
+                    units * unit_price,
                 ));
                 result.push_str(&format!(
                     "get_rich_slow_growth {{fund=\"{}\", name=\"{}\", description=\"{}\"}} {}\n",
-                    fund.name, a.get_name(), a.get_description(), a.get_growth().get_real_growth() * units * unit_price,
+                    fund.name,
+                    a.get_name(),
+                    a.get_description(),
+                    a.get_growth().get_real_growth() * units * unit_price,
                 ));
             }
         }
@@ -197,7 +211,10 @@ pub fn get_rocket_build(domainconfig: DomainConfig) -> Rocket<Build> {
         address: address.into(),
         ..Config::debug_default()
     };
+    // Default nordigen cache expiring to half a day
+    let nordigen_cache = NordigenCache::new(domainconfig.nordigen_cache_hours.unwrap_or(12));
     rocket::custom(config)
         .manage(domainconfig)
+        .manage(nordigen_cache)
         .mount("/", routes![get_overview, get_block, get_metrics])
 }

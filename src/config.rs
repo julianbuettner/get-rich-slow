@@ -11,6 +11,10 @@ pub struct Account {
     #[serde(rename = "api-secret")]
     pub api_secret: Option<String>, // Kraken, Binance
     pub address: Option<String>, // Crypto
+    #[serde(rename = "refresh-token")]
+    pub refresh_token: Option<String>, // Nordigen
+    #[serde(rename = "account-id")]
+    pub account_id: Option<String>, // Nordigen
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -31,6 +35,8 @@ pub struct Configuration {
     pub nodes: HashMap<String, String>,
     pub clients: Option<Vec<String>>,
     pub port: u16,
+    #[serde(rename = "nordigen-cache-hours")]
+    pub nordigen_cache_hours: Option<u64>,
     #[serde(rename = "listen-address")]
     pub listen_address: String,
 }

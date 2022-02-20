@@ -16,8 +16,15 @@ pub struct KrakenAccount {
 }
 
 #[derive(Clone)]
+pub struct NordigenAccount {
+    pub name: String,
+    pub refresh_token: String,
+    pub account_id: String,
+}
+
+#[derive(Clone)]
 pub enum Account {
     Ethereum(EthereumAccount),
-    Etoro { name: String, api_key: String },
     Kraken(KrakenAccount),
+    Nordigen(NordigenAccount),
 }

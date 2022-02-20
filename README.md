@@ -8,6 +8,7 @@ across multiple trading platforms, blockchains and wallets.
 ## 🔧 Supported Accounts
 
 - Kraken | _Crypto Exchange_
+- Nordigen | _European Banks_
 - TODO: Binance | _Crypto Exchange_
 - TODO: Etoro | _Stocks, ETFs, Crypto_
 - Binance Smart Chain | _Crypto, DeFi_
@@ -54,12 +55,15 @@ across multiple trading platforms, blockchains and wallets.
 ]
 ```
 
-Prometheus Metrics:  
+Open Metrics (Prometheus):  
 `http://127.0.0.1:8000/metrics`
 ```
-asset {fund="DeFi Wallet One", name="BNB", description="BSC", growth=0.0, units=0.01087607, unit-price=234.9, dollars=2.554717328}
-asset {fund="DeFi Wallet One", name="BUSD", description="ibBUSD", growth=0.060830735, units=222.88519, unit-price=1., dollars=222.88519}
+get_rich_slow_asset {fund="DeFi Wallet One", name="BNB", description="ibBUSD"} 200.554717328
+get_rich_slow_growth {fund="DeFi Wallet One", name="BNB", description="ibBUSD"} 22.88519
 ```
+`get_rich_slow_asset` - Dollars.  
+`get_rich_slow_growth` - How much more dollars will you
+have in one year from now.
 
 
 `http://127.0.0.1:8000/block`
@@ -95,6 +99,12 @@ accounts:
       kind: avalance-c
       address: 0xa1b2c3d4
 
+    # Check out nordigen-helper/
+    bank-account-1:
+      kind: nordigen
+      refresh-token: eyJWT
+      account-id: uuid
+
 # ==
 # Here you bundle wallets/accounts into one fund
 
@@ -102,7 +112,6 @@ funds:
     - name: My long term stock and crypto savings
       icon: money_bag
       accounts:
-        - etoro-1
         - kraken-1
 
     - name: My DeFi savings
