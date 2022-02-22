@@ -119,6 +119,22 @@ async fn get_balance_of_account(
         .json::<Value>()
         .await?;
 
+    if let Some(Value::String(v)) = result.get("summary") {
+        if v == "Invalid token" {
+            return Ok(BalanceAccountResult::AccessTokenExpired);
+        }
+    }
+
+    if let Some(Value::Number(v)) = result.get("status_code") {
+        if v.as_i64().unwrap() == 404 {
+            println!("Error! Nordigen Account {} not found!", account_id);
+            return Ok(BalanceAccountResult::Ok((
+                0.0,
+                FiatCurrency::USD,
+            )));
+        }
+    }
+
     let balance_details = result.get("balances").unwrap()[0]
         .get("balanceAmount")
         .unwrap();
