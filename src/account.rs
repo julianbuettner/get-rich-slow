@@ -23,8 +23,16 @@ pub struct NordigenAccount {
 }
 
 #[derive(Clone)]
+pub struct ScalableAccount {
+    pub name: String,
+    pub email: String,
+    pub password: String,
+}
+
+#[derive(Clone)]
 pub enum Account {
     Ethereum(EthereumAccount),
     Kraken(KrakenAccount),
     Nordigen(NordigenAccount),
+    Scalable(ScalableAccount),
 }

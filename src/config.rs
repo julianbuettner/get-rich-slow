@@ -15,6 +15,8 @@ pub struct Account {
     pub refresh_token: Option<String>, // Nordigen
     #[serde(rename = "account-id")]
     pub account_id: Option<String>, // Nordigen
+    pub email: Option<String>,   // Scalable
+    pub password: Option<String>, // Scalable
 }
 
 #[derive(Deserialize, Debug, Clone)]

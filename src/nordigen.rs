@@ -1,5 +1,6 @@
 use super::account::NordigenAccount;
 use super::asset::GenericAsset;
+use super::cryptoprice::get_token_price;
 use super::error::ApiError;
 use reqwest::{get, Client};
 use serde_json::Value;
@@ -128,10 +129,7 @@ async fn get_balance_of_account(
     if let Some(Value::Number(v)) = result.get("status_code") {
         if v.as_i64().unwrap() == 404 {
             println!("Error! Nordigen Account {} not found!", account_id);
-            return Ok(BalanceAccountResult::Ok((
-                0.0,
-                FiatCurrency::USD,
-            )));
+            return Ok(BalanceAccountResult::Ok((0.0, FiatCurrency::USD)));
         }
     }
 
@@ -158,7 +156,7 @@ pub async fn get_assets_of_nordigen_account(
             currency.to_string(),
             account.name.clone(),
             balance,
-            1.19,
+            get_token_price(&"EUR".to_string()).await?,
         )]);
     }
 

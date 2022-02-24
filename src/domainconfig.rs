@@ -1,4 +1,4 @@
-use super::account::{Account, EthereumAccount, KrakenAccount, NordigenAccount};
+use super::account::{Account, EthereumAccount, KrakenAccount, NordigenAccount, ScalableAccount};
 use super::blockchain::EthDefiToken;
 use super::config::Configuration;
 use super::ethereum::{EthereumChain, EthereumNode};
@@ -96,6 +96,17 @@ impl DomainConfig {
                         .account_id
                         .clone()
                         .expect("A nordigen account requires account-id"),
+                }),
+                "scalable" => Account::Scalable(ScalableAccount {
+                    name: name.clone(),
+                    email: account_config
+                        .email
+                        .clone()
+                        .expect("Scalable account requires email"),
+                    password: account_config
+                        .password
+                        .clone()
+                        .expect("Scalable account requires password"),
                 }),
                 x => panic!("Invalid account type: {}", x),
             };

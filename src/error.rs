@@ -3,7 +3,7 @@ use rocket::request::Request;
 use rocket::response::{self, Responder, Response};
 use std::io::Cursor;
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Debug)]
 pub struct ApiError {
     error_message: String,
 }

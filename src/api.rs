@@ -4,15 +4,14 @@ use super::blockchain::get_assets_of_ethereum_account;
 use super::domainconfig::DomainConfig;
 use super::error::ApiError;
 use super::kraken::get_assets_of_kraken_account;
-use super::nordigen::{NordigenCache, get_assets_of_nordigen_account};
+use super::scalable::{get_assets_of_scalable_account, ScalableCache};
+use super::nordigen::{get_assets_of_nordigen_account, NordigenCache};
 use rocket::serde::{json::json, json::Json, json::Value, Serialize};
 use rocket::Config;
 use rocket::{Build, Rocket, State};
 use serde_json::map::Map;
 use std::collections::HashMap;
 use std::time::{Duration, SystemTime};
-
-
 
 #[derive(Serialize)]
 pub struct AssetDto {
@@ -68,6 +67,7 @@ impl FundDto {
 pub async fn get_overview(
     domainconfig: &State<DomainConfig>,
     nordigen_cache: &State<NordigenCache>,
+    scalable_cache: &State<ScalableCache>,
 ) -> Result<Json<Vec<FundDto>>, ApiError> {
     let mut fund_dtos = Vec::new();
 
@@ -91,6 +91,13 @@ pub async fn get_overview(
                 }
                 Account::Nordigen(nordigen_account) => {
                     get_assets_of_nordigen_account(nordigen_cache, nordigen_account)
+                        .await?
+                        .iter_mut()
+                        .map(|x| Box::new(x.clone()) as Box<dyn Asset>)
+                        .collect::<Vec<Box<dyn Asset>>>()
+                }
+                Account::Scalable(scalable_account) => {
+                    get_assets_of_scalable_account(scalable_cache, scalable_account)
                         .await?
                         .iter_mut()
                         .map(|x| Box::new(x.clone()) as Box<dyn Asset>)
@@ -125,6 +132,7 @@ pub async fn get_overview(
 pub async fn get_metrics(
     domainconfig: &State<DomainConfig>,
     nordigen_cache: &State<NordigenCache>,
+    scalable_cache: &State<ScalableCache>,
 ) -> Result<String, ApiError> {
     let mut result = String::from(
         "# HELP get_rich_slow_asset Asset value in USD.\n
@@ -151,6 +159,13 @@ pub async fn get_metrics(
                 }
                 Account::Nordigen(nordigen_account) => {
                     get_assets_of_nordigen_account(nordigen_cache, nordigen_account)
+                        .await?
+                        .iter_mut()
+                        .map(|x| Box::new(x.clone()) as Box<dyn Asset>)
+                        .collect::<Vec<Box<dyn Asset>>>()
+                }
+                Account::Scalable(scalable_account) => {
+                    get_assets_of_scalable_account(scalable_cache, scalable_account)
                         .await?
                         .iter_mut()
                         .map(|x| Box::new(x.clone()) as Box<dyn Asset>)
@@ -220,11 +235,11 @@ pub fn get_rocket_build(domainconfig: DomainConfig) -> Rocket<Build> {
         ..Config::debug_default()
     };
     // Default nordigen cache expiring to half a day
-    let nordigen_cache = NordigenCache::new(
-        domainconfig.nordigen_cache_hours.unwrap_or(12),
-    );
+    let nordigen_cache = NordigenCache::new(domainconfig.nordigen_cache_hours.unwrap_or(3));
+    let scalable_cache = ScalableCache::new();
     rocket::custom(config)
         .manage(domainconfig)
         .manage(nordigen_cache)
+        .manage(scalable_cache)
         .mount("/", routes![get_overview, get_block, get_metrics])
 }

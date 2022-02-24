@@ -1,16 +1,16 @@
 # 🐌 Get Rich Slow
 
 ## 🦋 Purpose
-This is a stateless Rust HTTP server to track your assets,
-portfolios and crypto savings
+This is a stateless Rust HTTP server to track your stock portfolio,
+crypto investments and bank accounts
 across multiple trading platforms, blockchains and wallets.
 
 ## 🔧 Supported Accounts
 
 - Kraken | _Crypto Exchange_
 - Nordigen | _European Banks_
+- Scalable Capital | _European Stock Broker_
 - TODO: Binance | _Crypto Exchange_
-- TODO: Etoro | _Stocks, ETFs, Crypto_
 - Binance Smart Chain | _Crypto, DeFi_
     - BEP20 Tokens
     - Venus
@@ -105,6 +105,14 @@ accounts:
       refresh-token: eyJWT
       account-id: uuid
 
+    # Here you provide HIGHLY sensible credentials.
+    # Make sure noone can read your configuration.
+    # Also enable 2FA.
+    my-stocks:
+      kind: scalable
+      email: me@mail.com
+      password: veryverysecretpassword
+
 # ==
 # Here you bundle wallets/accounts into one fund
 
@@ -113,6 +121,7 @@ funds:
       icon: money_bag
       accounts:
         - kraken-1
+        - my-stocks
 
     - name: My DeFi savings
       icon: car
@@ -176,7 +185,6 @@ Please run `cargo fmt` before requesting.
 _Specific todos_
 - Kraken support
 - Binance support
-- Etoro support
 - Support multiple nodes per blockchain
 - Caching
 - Improve growth information

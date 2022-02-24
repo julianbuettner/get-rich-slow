@@ -10,6 +10,7 @@ mod ethereum;
 mod growth;
 mod kraken;
 mod nordigen;
+mod scalable;
 
 #[macro_use]
 extern crate rocket;
