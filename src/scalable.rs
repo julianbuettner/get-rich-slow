@@ -3,7 +3,7 @@ use super::asset::GenericAsset;
 use super::cryptoprice::get_token_price;
 use super::error::ApiError;
 use reqwest::Client;
-use serde_json::{Value, from_str};
+use serde_json::{from_str, Value};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
@@ -81,12 +81,10 @@ fn stock_crypto_balance_from_json(v: Value) -> Result<(f32, f32), ApiError> {
     if crypto_valuation.is_none() {
         return Err(default_error);
     }
-    Ok(
-        (
-            stock_valuation.unwrap().as_f64().unwrap() as f32,
-            crypto_valuation.unwrap().as_f64().unwrap() as f32,
-        )
-    )
+    Ok((
+        stock_valuation.unwrap().as_f64().unwrap() as f32,
+        crypto_valuation.unwrap().as_f64().unwrap() as f32,
+    ))
 }
 
 fn get_person_id_from_access_token(access_token: String) -> Result<String, ApiError> {
@@ -104,8 +102,10 @@ fn get_person_id_from_access_token(access_token: String) -> Result<String, ApiEr
     let value: Value = from_str(json_text).unwrap();
 
     match value.get("person_id") {
-        None => Err(ApiError::new(&String::from("person_id not found in Scalabe JWT"))),
-        Some(v) => Ok(v.as_str().unwrap().to_string())
+        None => Err(ApiError::new(&String::from(
+            "person_id not found in Scalabe JWT",
+        ))),
+        Some(v) => Ok(v.as_str().unwrap().to_string()),
     }
 }
 
@@ -150,6 +150,9 @@ async fn get_assets(access_token: &String, account_name: &String) -> Result<Asse
         .json::<Value>()
         .await?;
 
+    if result[0].get("errors").is_some() {
+        return Ok(AssetResult::AccessExpired);
+    }
     let (stocks, crypto) = stock_crypto_balance_from_json(result)?;
 
     let eur_price = get_token_price(&"EUR".to_string()).await?;
@@ -177,11 +180,11 @@ pub async fn get_assets_of_scalable_account(
 ) -> Result<Vec<GenericAsset>, ApiError> {
     let cached_access_token = cache.get(&account.email);
     let access_token = match cached_access_token {
-        None => { 
+        None => {
             let access = get_access_token(&account.email, &account.password).await?;
             cache.set(account.email.clone(), access.clone());
             access
-        },
+        }
         Some(v) => v,
     };
 

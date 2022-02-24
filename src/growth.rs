@@ -14,7 +14,8 @@ impl Growth {
         }
     }
 
-    pub fn new_with_inflation(yearly_growth: f32, inflation: f32) -> Self {
+    // TODO fetch inflation data for USD and PoS assets
+    pub fn _new_with_inflation(yearly_growth: f32, inflation: f32) -> Self {
         Self {
             yearly_growth: yearly_growth,
             inflation: Some(inflation),

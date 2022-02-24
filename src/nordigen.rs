@@ -2,7 +2,7 @@ use super::account::NordigenAccount;
 use super::asset::GenericAsset;
 use super::cryptoprice::get_token_price;
 use super::error::ApiError;
-use reqwest::{get, Client};
+use reqwest::Client;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};

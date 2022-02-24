@@ -13,7 +13,6 @@ use web3::types::Address;
 
 #[derive(Clone, PartialEq)]
 pub enum EthDefiToken {
-    Erc20,
     Bep20,
     Alpaca,
     Venus,

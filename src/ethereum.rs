@@ -11,7 +11,7 @@ pub enum EthereumChain {
 }
 
 impl EthereumChain {
-    pub fn from_str(s: &str) -> Self {
+    pub fn _from_str(s: &str) -> Self {
         match s.to_lowercase().as_str() {
             "avac" => Self::AvalancheC,
             "avax-c" => Self::AvalancheC,

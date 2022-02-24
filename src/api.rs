@@ -4,14 +4,12 @@ use super::blockchain::get_assets_of_ethereum_account;
 use super::domainconfig::DomainConfig;
 use super::error::ApiError;
 use super::kraken::get_assets_of_kraken_account;
-use super::scalable::{get_assets_of_scalable_account, ScalableCache};
 use super::nordigen::{get_assets_of_nordigen_account, NordigenCache};
+use super::scalable::{get_assets_of_scalable_account, ScalableCache};
 use rocket::serde::{json::json, json::Json, json::Value, Serialize};
 use rocket::Config;
 use rocket::{Build, Rocket, State};
 use serde_json::map::Map;
-use std::collections::HashMap;
-use std::time::{Duration, SystemTime};
 
 #[derive(Serialize)]
 pub struct AssetDto {

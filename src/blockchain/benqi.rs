@@ -42,8 +42,6 @@ async fn get_benqi_avax_rewards_of_pool(
         BENQI_COMPTROLLER_ADDRESS,
         get_benqi_comptroller_abi(),
     );
-    let smart_qi_token =
-        Web3Contract::new(web3.eth(), *lending_token_contract_address, get_benqi_abi());
     let reward_speed_benqi: web3::types::U256 = smart_comptroller
         .query(
             "rewardSpeeds",

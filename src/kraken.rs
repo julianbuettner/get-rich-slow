@@ -76,7 +76,7 @@ async fn kraken_price_hashmap(
     Ok(result)
 }
 
-async fn get_apy(client: &Client, symbol: &str) -> Result<f32, ApiError> {
+async fn get_apy(_client: &Client, symbol: &str) -> Result<f32, ApiError> {
     let apr = match symbol {
         "DOT.S" => 0.12,
         "ETH2.S" => 0.03,
@@ -86,7 +86,7 @@ async fn get_apy(client: &Client, symbol: &str) -> Result<f32, ApiError> {
 }
 
 pub async fn get_assets_of_kraken_account(
-    domainconfig: &DomainConfig,
+    _domainconfig: &DomainConfig,
     account: &KrakenAccount,
 ) -> Result<Vec<GenericAsset>, ApiError> {
     let client = Client::new(account.api_key.as_str(), account.api_secret.as_str());
